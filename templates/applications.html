@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, page_header, empty_state, status_badge %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+{{ page_header('Applications', url_for('application_new'), '+ Add application') }}
+
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a href="{{ url_for('applications') }}" class="btn btn-sm {{ 'btn-dark' if not status else 'btn-outline-secondary' }}">All</a>
+    {% for s in STATUSES %}
+    <a href="{{ url_for('applications', status=s) }}" class="btn btn-sm {{ 'btn-dark' if status == s else 'btn-outline-secondary' }}">{{ s }}</a>
+    {% endfor %}
+</div>
+
+{% if applications %}
+<div class="card">
+<div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+    <thead><tr>
+        <th>Job</th><th>Applied</th><th>Status</th><th>Resume</th><th class="text-center">Cover letter</th>
+        <th class="text-center">Interviews</th><th class="text-end">Actions</th>
+    </tr></thead>
+    <tbody>
+    {% for a in applications %}
+    <tr>
+        <td>
+            <a href="{{ url_for('application_detail', application_id=a.application_id) }}" class="fw-semibold">{{ a.job_title }}</a>
+            <div class="small text-muted">{{ a.company_name }}</div>
+        </td>
+        <td class="text-nowrap">{{ a.application_date }}</td>
+        <td>{{ status_badge(a.status) }}</td>
+        <td>{{ a.resume_version or '—' }}</td>
+        <td class="text-center">{{ '✔' if a.cover_letter_sent else '—' }}</td>
+        <td class="text-center">{{ a.interviews|length }}</td>
+        <td class="text-end text-nowrap">
+            <a href="{{ url_for('application_edit', application_id=a.application_id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+            {{ delete_button(url_for('application_delete', application_id=a.application_id),
+               "Delete your application for " ~ a.job_title ~ " at " ~ a.company_name ~ "?") }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+{% elif status %}
+{{ empty_state('No applications with status "' ~ status ~ '".') }}
+{% else %}
+{{ empty_state('No applications yet.', url_for('application_new'), 'Log your first application') }}
+{% endif %}
+{% endblock %}

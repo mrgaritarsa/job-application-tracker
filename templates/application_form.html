@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} application{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">{{ action }} application</h1>
+
+{% if not jobs %}
+<div class="alert alert-warning">
+    You need to save a job before logging an application.
+    <a href="{{ url_for('job_new') }}" class="alert-link">Add a job</a>.
+</div>
+{% else %}
+<form method="post" class="card card-body form-card" novalidate>
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label for="job_id" class="form-label">Job <span class="text-danger">*</span></label>
+            <select id="job_id" name="job_id" class="form-select" required>
+                <option value="">Choose a job…</option>
+                {% for j in jobs %}
+                <option value="{{ j.job_id }}" {{ 'selected' if a.job_id|string == j.job_id|string }}>{{ j.company_name }} — {{ j.job_title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="application_date" class="form-label">Application date <span class="text-danger">*</span></label>
+            <input id="application_date" name="application_date" type="date" class="form-control" required
+                   value="{{ a.application_date or '' }}">
+        </div>
+        <div class="col-md-4">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select">
+                {% for s in STATUSES %}<option {{ 'selected' if a.status == s }}>{{ s }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="resume_version" class="form-label">Resume version</label>
+            <input id="resume_version" name="resume_version" class="form-control" maxlength="50"
+                   value="{{ a.resume_version or '' }}" placeholder="e.g. v2-software">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check mb-2">
+                <input id="cover_letter_sent" name="cover_letter_sent" type="checkbox" class="form-check-input" value="1"
+                       {{ 'checked' if a.cover_letter_sent and a.cover_letter_sent|string not in ['0', 'False'] }}>
+                <label for="cover_letter_sent" class="form-check-label">Cover letter sent</label>
+            </div>
+        </div>
+        <div class="col-12">
+            <label for="interview_data" class="form-label">Interview rounds</label>
+            <textarea id="interview_data" name="interview_data" class="form-control font-monospace" rows="4"
+                      placeholder="2026-11-02 | Phone Screen | Talked with recruiter about salary">{{ a.interview_data or '' }}</textarea>
+            <div class="form-text">One round per line: <code>YYYY-MM-DD | Round name | Notes</code>. Stored as a JSON array.</div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">{{ 'Save changes' if action == 'Edit' else 'Add application' }}</button>
+        <a href="{{ url_for('application_detail', application_id=a.application_id) if a.application_id else url_for('applications') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

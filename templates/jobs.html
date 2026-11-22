@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, page_header, empty_state, skill_pills, salary_range %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+{{ page_header('Jobs', url_for('job_new'), '+ Add job') }}
+
+<div class="mb-3 d-flex flex-wrap gap-2">
+    <a href="{{ url_for('jobs') }}" class="btn btn-sm {{ 'btn-dark' if not job_type else 'btn-outline-secondary' }}">All</a>
+    {% for t in JOB_TYPES %}
+    <a href="{{ url_for('jobs', type=t) }}" class="btn btn-sm {{ 'btn-dark' if job_type == t else 'btn-outline-secondary' }}">{{ t }}</a>
+    {% endfor %}
+</div>
+
+{% if jobs %}
+<div class="card">
+<div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+    <thead><tr>
+        <th>Job</th><th>Type</th><th>Salary</th><th>Required skills</th><th>Posted</th>
+        <th class="text-end">Actions</th>
+    </tr></thead>
+    <tbody>
+    {% for j in jobs %}
+    <tr>
+        <td>
+            <a href="{{ url_for('job_detail', job_id=j.job_id) }}" class="fw-semibold">{{ j.job_title }}</a>
+            <div class="small text-muted">{{ j.company_name }}{% if j.app_count %} · {{ j.app_count }} application{{ 's' if j.app_count != 1 }}{% endif %}</div>
+        </td>
+        <td>{{ j.job_type or '—' }}</td>
+        <td class="text-nowrap">{{ salary_range(j.salary_min, j.salary_max) }}</td>
+        <td>{{ skill_pills(j.skills) }}</td>
+        <td class="text-nowrap">{{ j.date_posted or '—' }}</td>
+        <td class="text-end text-nowrap">
+            <a href="{{ url_for('job_edit', job_id=j.job_id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+            {{ delete_button(url_for('job_delete', job_id=j.job_id),
+               "Delete " ~ j.job_title ~ " at " ~ j.company_name ~ "? Its " ~ j.app_count ~ " application(s) will also be deleted.") }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+{% elif job_type %}
+{{ empty_state('No ' ~ job_type ~ ' jobs saved.') }}
+{% else %}
+{{ empty_state('No jobs yet.', url_for('job_new'), 'Add your first job') }}
+{% endif %}
+{% endblock %}

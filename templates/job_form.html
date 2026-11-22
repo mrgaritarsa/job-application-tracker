@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} job{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">{{ action }} job</h1>
+
+{% if not companies %}
+<div class="alert alert-warning">
+    You need at least one company before adding a job.
+    <a href="{{ url_for('company_new') }}" class="alert-link">Add a company</a>.
+</div>
+{% else %}
+<form method="post" class="card card-body form-card" novalidate>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="company_id" class="form-label">Company <span class="text-danger">*</span></label>
+            <select id="company_id" name="company_id" class="form-select" required>
+                <option value="">Choose a company…</option>
+                {% for c in companies %}
+                <option value="{{ c.company_id }}" {{ 'selected' if job.company_id|string == c.company_id|string }}>{{ c.company_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="job_title" class="form-label">Job title <span class="text-danger">*</span></label>
+            <input id="job_title" name="job_title" class="form-control" maxlength="100" required
+                   value="{{ job.job_title or '' }}">
+        </div>
+        <div class="col-md-4">
+            <label for="job_type" class="form-label">Job type</label>
+            <select id="job_type" name="job_type" class="form-select">
+                {% for t in JOB_TYPES %}
+                <option {{ 'selected' if job.job_type == t }}>{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="salary_min" class="form-label">Minimum salary ($)</label>
+            <input id="salary_min" name="salary_min" type="number" min="0" step="1000" class="form-control"
+                   value="{{ job.salary_min if job.salary_min is not none else '' }}">
+        </div>
+        <div class="col-md-4">
+            <label for="salary_max" class="form-label">Maximum salary ($)</label>
+            <input id="salary_max" name="salary_max" type="number" min="0" step="1000" class="form-control"
+                   value="{{ job.salary_max if job.salary_max is not none else '' }}">
+        </div>
+        <div class="col-md-8">
+            <label for="job_url" class="form-label">Job posting URL</label>
+            <input id="job_url" name="job_url" type="url" class="form-control" maxlength="300"
+                   value="{{ job.job_url or '' }}" placeholder="https://…">
+        </div>
+        <div class="col-md-4">
+            <label for="date_posted" class="form-label">Date posted</label>
+            <input id="date_posted" name="date_posted" type="date" class="form-control"
+                   value="{{ job.date_posted or '' }}">
+        </div>
+        <div class="col-12">
+            <label for="requirements" class="form-label">Required skills</label>
+            <input id="requirements" name="requirements" class="form-control"
+                   value="{{ job.requirements or '' }}" placeholder="Python, SQL, Flask">
+            <div class="form-text">Separate skills with commas. These are stored as a JSON array and used by Job Match.</div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">{{ 'Save changes' if action == 'Edit' else 'Add job' }}</button>
+        <a href="{{ url_for('job_detail', job_id=job.job_id) if job.job_id else url_for('jobs') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

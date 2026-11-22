@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% from "_macros.html" import skill_pills, salary_range %}
+{% block title %}Job Match{% endblock %}
+{% block content %}
+<h1 class="h3 mb-1">Job Match</h1>
+<p class="text-muted mb-4">Enter your skills to see saved jobs ranked by the percentage of their required skills you have.</p>
+
+<form method="post" class="card card-body mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-8">
+            <label for="skills" class="form-label fw-semibold">Your skills</label>
+            <input id="skills" name="skills" class="form-control form-control-lg" value="{{ skills_text }}"
+                   placeholder="Python, SQL, Flask" autofocus>
+        </div>
+        <div class="col-6 col-md-2">
+            <label for="min_percent" class="form-label">Minimum match</label>
+            <select id="min_percent" name="min_percent" class="form-select form-select-lg">
+                {% for p in [0, 25, 50, 75, 100] %}
+                <option value="{{ p }}" {{ 'selected' if min_percent == p }}>{{ p }}%</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-6 col-md-2 d-grid">
+            <button class="btn btn-primary btn-lg">Find matches</button>
+        </div>
+    </div>
+    {% if known_skills %}
+    <div class="mt-3 small">
+        <span class="text-muted me-1">Skills in your saved jobs (click to add):</span>
+        {% for s in known_skills %}<button type="button" class="pill skill pill-btn" data-skill="{{ s }}">{{ s }}</button>{% endfor %}
+    </div>
+    {% endif %}
+</form>
+
+{% if results is not none %}
+<h2 class="h5 mb-3">
+    Matching jobs <span class="text-muted fw-normal">({{ results|length }})</span>
+    <span class="small fw-normal text-muted ms-2">for {{ user_skills|join(', ') }}</span>
+</h2>
+
+{% for r in results %}
+{% set level = 'high' if r.percent >= 75 else ('mid' if r.percent >= 40 else 'low') %}
+<div class="card match-card mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div>
+                <span class="rank">{{ loop.index }}.</span>
+                <a href="{{ url_for('job_detail', job_id=r.job_id) }}" class="fw-semibold fs-5">{{ r.job_title }}</a>
+                <span class="text-muted">at {{ r.company_name }}</span>
+                <div class="small text-muted">{{ r.job_type }} · {{ salary_range(r.salary_min, r.salary_max) }}</div>
+            </div>
+            <div class="text-end">
+                <div class="match-pct match-{{ level }}">{{ r.percent }}%</div>
+                <div class="small text-muted">{{ r.matched|length }}/{{ r.required_count }} skills</div>
+            </div>
+        </div>
+        <div class="progress my-3" style="height: 8px;" role="progressbar" aria-label="Match"
+             aria-valuenow="{{ r.percent }}" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar bar-match-{{ level }}" style="width: {{ r.percent }}%"></div>
+        </div>
+        <div class="row small g-2">
+            <div class="col-md-6"><span class="text-muted me-1">Have:</span>
+                {{ skill_pills(r.matched, 'have') if r.matched else '—' }}</div>
+            <div class="col-md-6"><span class="text-muted me-1">Missing:</span>
+                {{ skill_pills(r.missing, 'missing') if r.missing else 'Nothing — you meet every requirement!' }}</div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card card-body text-muted">No saved jobs match at {{ min_percent }}% or higher.</div>
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Clicking a suggested skill appends it to the skills box (if not already there).
+    document.querySelectorAll('.pill-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = document.getElementById('skills');
+            var current = input.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+            var lower = current.map(function (s) { return s.toLowerCase(); });
+            if (lower.indexOf(btn.dataset.skill.toLowerCase()) === -1) { current.push(btn.dataset.skill); }
+            input.value = current.join(', ');
+            input.focus();
+        });
+    });
+</script>
+{% endblock %}

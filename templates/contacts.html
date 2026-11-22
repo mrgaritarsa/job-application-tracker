@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, page_header, empty_state %}
+{% block title %}Contacts{% endblock %}
+{% block content %}
+{{ page_header('Contacts', url_for('contact_new'), '+ Add contact') }}
+
+{% if contacts %}
+<div class="card">
+<div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+    <thead><tr>
+        <th>Name</th><th>Company</th><th>Email</th><th>Phone</th><th>LinkedIn</th>
+        <th class="text-end">Actions</th>
+    </tr></thead>
+    <tbody>
+    {% for ct in contacts %}
+    <tr>
+        <td>
+            <a href="{{ url_for('contact_detail', contact_id=ct.contact_id) }}" class="fw-semibold">{{ ct.contact_name }}</a>
+            {% if ct.title %}<div class="small text-muted">{{ ct.title }}</div>{% endif %}
+        </td>
+        <td><a href="{{ url_for('company_detail', company_id=ct.company_id) }}" class="text-body">{{ ct.company_name }}</a></td>
+        <td>{% if ct.email %}<a href="mailto:{{ ct.email }}">{{ ct.email }}</a>{% else %}—{% endif %}</td>
+        <td class="text-nowrap">{{ ct.phone or '—' }}</td>
+        <td>{% if ct.linkedin_url %}<a href="{{ ct.linkedin_url }}" target="_blank" rel="noopener">Profile ↗</a>{% else %}—{% endif %}</td>
+        <td class="text-end text-nowrap">
+            <a href="{{ url_for('contact_edit', contact_id=ct.contact_id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+            {{ delete_button(url_for('contact_delete', contact_id=ct.contact_id), "Delete contact " ~ ct.contact_name ~ "?") }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+{% else %}
+{{ empty_state('No contacts yet.', url_for('contact_new'), 'Add your first contact') }}
+{% endif %}
+{% endblock %}

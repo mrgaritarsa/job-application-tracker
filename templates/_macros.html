@@ -1,0 +1,33 @@
+{# Reusable template snippets #}
+
+{% macro delete_button(action_url, message, label='Delete', size='sm') -%}
+<form method="post" action="{{ action_url }}" class="d-inline" data-confirm="{{ message }}">
+    <button type="submit" class="btn btn-outline-danger btn-{{ size }}">{{ label }}</button>
+</form>
+{%- endmacro %}
+
+{% macro status_badge(status) -%}
+<span class="badge status-badge status-{{ status|lower }}">{{ status }}</span>
+{%- endmacro %}
+
+{% macro skill_pills(skills, cls='skill') -%}
+{% for s in skills %}<span class="pill {{ cls }}">{{ s }}</span>{% endfor %}
+{%- endmacro %}
+
+{% macro salary_range(min, max) -%}
+{% if min is none and max is none %}—{% elif max is none %}{{ min|money }}+{% elif min is none %}up to {{ max|money }}{% else %}{{ min|money }} – {{ max|money }}{% endif %}
+{%- endmacro %}
+
+{% macro page_header(title, button_url=None, button_label=None) -%}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <h1 class="h3 mb-0">{{ title }}</h1>
+    {% if button_url %}<a href="{{ button_url }}" class="btn btn-primary">{{ button_label }}</a>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro empty_state(message, button_url=None, button_label=None) -%}
+<div class="card card-body text-center text-muted py-5">
+    <p class="mb-3">{{ message }}</p>
+    {% if button_url %}<div><a href="{{ button_url }}" class="btn btn-primary btn-sm">{{ button_label }}</a></div>{% endif %}
+</div>
+{%- endmacro %}

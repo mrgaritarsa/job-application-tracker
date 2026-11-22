@@ -1,0 +1,70 @@
+/* ===== Job Application Tracker styles ===== */
+:root {
+    --brand: #2f4b7c;
+    --brand-dark: #22385e;
+    --bg: #f4f6fa;
+}
+
+body { background: var(--bg); color: #1f2937; }
+
+.app-nav { background: var(--brand); }
+.app-nav .nav-link { color: rgba(255, 255, 255, .8); }
+.app-nav .nav-link:hover, .app-nav .nav-link.active { color: #fff; }
+.app-nav .nav-link.active { font-weight: 600; border-bottom: 2px solid #fff; }
+
+.btn-primary { background: var(--brand); border-color: var(--brand); }
+.btn-primary:hover, .btn-primary:focus { background: var(--brand-dark); border-color: var(--brand-dark); }
+a { color: var(--brand); }
+
+.card { border: 1px solid #e3e7ef; border-radius: .6rem; box-shadow: 0 1px 2px rgba(16, 24, 40, .04); }
+.card-header { border-bottom-color: #e3e7ef; }
+.table > :not(caption) > * > * { padding: .75rem .9rem; }
+.table thead th { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: #6b7280; font-weight: 600; }
+.form-card { max-width: 860px; }
+.notes { white-space: pre-wrap; }
+
+/* Dashboard */
+.stat-card { color: inherit; transition: transform .1s ease, box-shadow .1s ease; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 24, 40, .08); }
+.stat-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; }
+.stat-value { font-size: 2rem; font-weight: 700; color: var(--brand); line-height: 1.2; }
+.stat-value-sm { font-size: 1.35rem; }
+
+/* Status badges and bars */
+.status-badge { font-weight: 600; }
+.status-applied,   .bar-applied   { background: #4c6ef5 !important; color: #fff; }
+.status-screening, .bar-screening { background: #15aabf !important; color: #fff; }
+.status-interview, .bar-interview { background: #f59f00 !important; color: #fff; }
+.status-offer,     .bar-offer     { background: #2f9e44 !important; color: #fff; }
+.status-rejected,  .bar-rejected  { background: #e03131 !important; color: #fff; }
+.status-withdrawn, .bar-withdrawn { background: #868e96 !important; color: #fff; }
+
+/* Skill pills */
+.pill {
+    display: inline-block; padding: .15rem .55rem; margin: .1rem .2rem .1rem 0;
+    border-radius: 999px; font-size: .78rem; border: 1px solid transparent; line-height: 1.4;
+}
+.pill.skill   { background: #eef2ff; color: #3b4a8a; border-color: #d9e0ff; }
+.pill.have    { background: #e6f6ea; color: #23733a; border-color: #c4e8cd; }
+.pill.missing { background: #fdecec; color: #a82626; border-color: #f6caca; }
+.pill-btn { cursor: pointer; }
+.pill-btn:hover { background: #dfe6ff; }
+
+/* Job match */
+.match-card .rank { color: #9ca3af; font-weight: 600; margin-right: .25rem; }
+.match-pct { font-size: 1.75rem; font-weight: 700; line-height: 1; }
+.match-high { color: #2f9e44; }
+.match-mid  { color: #e67700; }
+.match-low  { color: #c92a2a; }
+.bar-match-high { background: #2f9e44; }
+.bar-match-mid  { background: #f59f00; }
+.bar-match-low  { background: #e03131; }
+
+/* Interview timeline */
+.timeline { list-style: none; padding-left: 1.25rem; margin: 0; border-left: 2px solid #dbe2ef; }
+.timeline li { position: relative; padding: 0 0 1.1rem .75rem; }
+.timeline li:last-child { padding-bottom: 0; }
+.timeline li::before {
+    content: ""; position: absolute; left: -1.72rem; top: .3rem;
+    width: .8rem; height: .8rem; border-radius: 50%; background: var(--brand); border: 2px solid #fff;
+}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    {% for label, value, endpoint in [
+        ('Companies', counts.companies, 'companies'),
+        ('Jobs', counts.jobs, 'jobs'),
+        ('Applications', counts.applications, 'applications'),
+        ('Contacts', counts.contacts, 'contacts')] %}
+    <div class="col-6 col-lg-3">
+        <a href="{{ url_for(endpoint) }}" class="card stat-card text-decoration-none h-100">
+            <div class="card-body">
+                <div class="stat-label">{{ label }}</div>
+                <div class="stat-value">{{ value }}</div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="stat-label">Active applications</div>
+            <div class="stat-value">{{ active }}</div>
+            <div class="text-muted small">Applied, screening or interviewing</div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="stat-label">Response rate</div>
+            <div class="stat-value">{{ response_rate }}%</div>
+            <div class="text-muted small">Applications that got any reply</div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="stat-label">Average salary range</div>
+            <div class="stat-value stat-value-sm">
+                {% if salary.avg_min is not none %}{{ salary.avg_min|money }} – {{ salary.avg_max|money }}{% else %}—{% endif %}
+            </div>
+            <div class="text-muted small">Across all saved jobs</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-semibold">Applications by status</div>
+            <div class="card-body">
+                {% for status, total in by_status.items() %}
+                {% set pct = (total / total_apps * 100) if total_apps else 0 %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <a href="{{ url_for('applications', status=status) }}" class="text-decoration-none">{{ status_badge(status) }}</a>
+                        <span class="text-muted">{{ total }}</span>
+                    </div>
+                    <div class="progress" style="height: 8px;" role="progressbar" aria-label="{{ status }}"
+                         aria-valuenow="{{ pct|round }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar bar-{{ status|lower }}" style="width: {{ pct }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold d-flex justify-content-between">
+                Recent applications
+                <a href="{{ url_for('application_new') }}" class="small">+ Add</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for a in recent %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('application_detail', application_id=a.application_id) }}" class="text-decoration-none">
+                        <strong>{{ a.job_title }}</strong> <span class="text-muted">at {{ a.company_name }}</span>
+                    </a>
+                    <span class="text-nowrap ms-2">
+                        <span class="text-muted small me-2">{{ a.application_date }}</span>{{ status_badge(a.status) }}
+                    </span>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No applications yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">Saved jobs you haven't applied to</div>
+            <ul class="list-group list-group-flush">
+                {% for j in not_applied %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('job_detail', job_id=j.job_id) }}" class="text-decoration-none">
+                        <strong>{{ j.job_title }}</strong> <span class="text-muted">at {{ j.company_name }}</span>
+                    </a>
+                    <a href="{{ url_for('application_new', job_id=j.job_id) }}" class="btn btn-sm btn-outline-primary">Apply</a>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">You've applied to every saved job. 🎉</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
